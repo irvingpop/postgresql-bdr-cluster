@@ -1,0 +1,13 @@
+name 'postgresql-bdr-cluster'
+maintainer 'Irving Popovetsky'
+maintainer_email 'irving@chef.io'
+license 'all_rights'
+description 'Installs/Configures postgresql-bdr-cluster'
+long_description 'Installs/Configures postgresql-bdr-cluster'
+version '0.1.0'
+source_url       'https://github.com/irvingpop/postgresql-bdr-cluster'
+issues_url       'https://github.com/irvingpop/postgresql-bdr-cluster/issues'
+
+depends 'yum-2ndquadrant'
+depends 'hostsfile'
+depends 'chef-provisioning-vagrant-helper'
