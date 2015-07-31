@@ -31,8 +31,8 @@ found_nodes = search(:node, "name:postgresql-*",
 
 found_nodes.each do |nodedata|
   hostsfile_entry extract_cluster_ip(nodedata) do
-    hostname nodedata['fqdn']
-    aliases [ nodedata['name'] ]
+    hostname nodedata['name']
+    aliases [ nodedata['fqdn'] ]
     unique true
     comment 'Chef postgresql-bdr-cluster cookbook'
   end
@@ -113,21 +113,21 @@ if found_nodes.count == 0
 
   node['postgresql-bdr-cluster']['bdr_dbnames'].each do |dbname|
     execute "bdr_setup_#{node.name}_#{dbname}" do
-      command %Q(#{postgres_bin_dir}/psql #{dbname} -c "SELECT bdr.bdr_group_create( local_node_name := '#{node.fqdn}', node_external_dsn := 'host=#{my_cluster_ip} dbname=#{dbname} password=password user=replication' )")
+      command %Q(#{postgres_bin_dir}/psql #{dbname} -c "SELECT bdr.bdr_group_create( local_node_name := '#{node.name}', node_external_dsn := 'host=#{my_cluster_ip} dbname=#{dbname} password=password user=replication' )")
       user 'postgres'
-      not_if "#{postgres_bin_dir}/psql #{dbname} -c 'SELECT node_name FROM bdr.bdr_nodes' |grep #{node.fqdn}"
+      not_if "#{postgres_bin_dir}/psql #{dbname} -c 'SELECT node_name FROM bdr.bdr_nodes' |grep #{node.name}"
       notifies :run, "execute[bdr_wait_#{node.name}_#{dbname}]", :immediately
     end
   end
 else
   pick_a_node = found_nodes.sample # pick one at random, not me
-  log "Joining the Postgres cluster, talking to #{pick_a_node['fqdn']}"
+  log "Joining the Postgres cluster, talking to #{pick_a_node['name']}"
 
   node['postgresql-bdr-cluster']['bdr_dbnames'].each do |dbname|
     execute "bdr_join_#{node.name}_#{dbname}" do
-      command %Q(#{postgres_bin_dir}/psql #{dbname} -c "SELECT bdr.bdr_group_join( local_node_name := '#{node.fqdn}', node_external_dsn := 'host=#{my_cluster_ip} dbname=#{dbname} password=password user=replication', join_using_dsn := 'host=#{pick_a_node['fqdn']} dbname=#{dbname} password=password user=replication' )")
+      command %Q(#{postgres_bin_dir}/psql #{dbname} -c "SELECT bdr.bdr_group_join( local_node_name := '#{node.name}', node_external_dsn := 'host=#{my_cluster_ip} dbname=#{dbname} password=password user=replication', join_using_dsn := 'host=#{pick_a_node['name']} dbname=#{dbname} password=password user=replication' )")
       user 'postgres'
-      not_if "#{postgres_bin_dir}/psql #{dbname} -c 'SELECT node_name FROM bdr.bdr_nodes' |grep #{node.fqdn}"
+      not_if "#{postgres_bin_dir}/psql #{dbname} -c 'SELECT node_name FROM bdr.bdr_nodes' |grep #{node.name}"
       notifies :run, "execute[bdr_wait_#{node.name}_#{dbname}]", :immediately
     end
   end

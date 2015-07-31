@@ -24,6 +24,7 @@ task :setup do
     sh('berks vendor vendor/ --quiet')
   else
     sh('berks update --quiet')
+    sh('rm -rf vendor/*')
     sh('berks vendor vendor/ --quiet')
   end
 end

@@ -2,12 +2,22 @@ cluster_nodes_count = 3
 default['postgresql-bdr-cluster']['cluster_nodes'] = 1.upto(cluster_nodes_count).map { |i| "postgresql-#{i}.example.com" }
 
 # Provisiong driver settings
-default['postgresql-bdr-cluster']['provisioning']['driver'] = 'vagrant'
+default['postgresql-bdr-cluster']['provisioning']['driver'] = 'aws'
 
+# Vagrant settings
 default['chef-provisioning-vagrant']['vbox']['box'] = 'box-cutter/centos71'
 default['chef-provisioning-vagrant']['vbox']['ram'] = 512
 default['chef-provisioning-vagrant']['vbox']['cpus'] = 1
 default['chef-provisioning-vagrant']['vbox']['private_networks']['default'] = 'dhcp'
+
+# AWS settings
+default['chef-provisioning-aws']['region'] = 'us-west-2'
+default['chef-provisioning-aws']['ssh_username'] = 'ec2-user'
+default['chef-provisioning-aws']['instance_type'] = 'c3.xlarge'
+default['chef-provisioning-aws']['ebs_optimized'] = true
+default['chef-provisioning-aws']['image_id'] = 'ami-4dbf9e7d' # RHEL 7.1 2015-02
+default['chef-provisioning-aws']['subnet_id'] = 'subnet-b2bb82f4'
+default['chef-provisioning-aws']['keypair_name'] = "#{ENV['USER']}@postgresql-bdr-cluster"
 
 # Postgres settings
 default['postgresql-bdr-cluster']['bdr_dbnames'] = %w(opscode_chef bifrost opscode_reporting oc_id)
