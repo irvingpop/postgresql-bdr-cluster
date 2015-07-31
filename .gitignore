@@ -20,3 +20,4 @@ vagrants
 nodes
 clients
 .chef/local-mode-cache/
+.chef/keys/
